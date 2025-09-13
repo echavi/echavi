@@ -31,6 +31,10 @@ changesetControl.onAdd = function(map) {
             </form>
         </div>
     `;
+    // Prevent clicks from propagating to the map
+    container.addEventListener('click', e => e.stopPropagation());
+    container.addEventListener('mousedown', e => e.stopPropagation());
+    container.addEventListener('dblclick', e => e.stopPropagation());
     return container;
 };
 changesetControl.addTo(map);
