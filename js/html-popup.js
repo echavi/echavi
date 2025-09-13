@@ -5,6 +5,8 @@
 export function htmlChangesetPopup(changesetMetadata) {
 
     const osmLink = `https://www.openstreetmap.org/changeset/${changesetMetadata.id}`;
+    const achaviLink = `https://overpass-api.de/achavi/?changeset=${changesetMetadata.id}`;
+    const osmchaLink = `https://osmcha.org/changesets/${changesetMetadata.id}`;
 
     // Build table rows for every tag key/value
     const tagRows = Object.entries(changesetMetadata.tags || {})
@@ -21,6 +23,9 @@ export function htmlChangesetPopup(changesetMetadata) {
                 <tr><td colspan="2"><hr style="display:none;"></td></tr>
                 ${tagRows}
             </table>
+            <div>
+                View in <a href="${achaviLink}">achavi</a>, <a href="${osmchaLink}">OSMCha</a>
+            </div>
         `;
 }
 
