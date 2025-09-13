@@ -14,6 +14,10 @@ const tiles = new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Apply a dark filter to the tile layer
 tiles.getContainer().style.filter = TILE_DARKNESS;
 
+// Add github link to attribution
+const attributionDiv = document.querySelector('div.leaflet-control-attribution');
+attributionDiv.innerHTML = `<a href="https://github.com/echavi/echavi">echavi</a> | ` + attributionDiv.innerHTML;
+
 // Add custom control for changeset input
 const changesetControl = new Control({ position: 'topright' });
 changesetControl.onAdd = function(map) {
