@@ -34,3 +34,9 @@ javascript:(function() {
 ```
 
 3. Go to any OSM changeset page and click the bookmark to open it in echavi.
+
+## Credits
+
+- Inspired by [achavi](https://github.com/nrenner/achavi)  
+- Map tiles by [OpenStreetMap](https://www.openstreetmap.org/)  
+- Built with [Leaflet](https://leafletjs.com/)
