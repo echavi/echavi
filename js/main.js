@@ -1,5 +1,5 @@
 import { LeafletMap, TileLayer, Control, FeatureGroup } from 'leaflet';
-import { getChangesetMetadata, getOverpassAdiff } from './overpass-api.js';
+import { getChangesetMetadata, getChangesetOverpassAdiff } from './overpass-api.js';
 import { getLayersFromChangesetMetadata, getLayersFromOverpassAdiff } from './map-layers.js';
 
 const TILE_DARKNESS = 'brightness(30%)';
@@ -77,7 +77,7 @@ async function loadChangesetDiff(id) {
     map.fitBounds(bboxLayer.getBounds());
 
     // Load and display changeset content
-    const adiff = await getOverpassAdiff(changesetMetadata);
+    const adiff = await getChangesetOverpassAdiff(changesetMetadata);
     const layers = getLayersFromOverpassAdiff(adiff);
     oldPolyLayer = layers.oldPolyLayer;
     newPolyLayer = layers.newPolyLayer;
