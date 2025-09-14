@@ -1,3 +1,4 @@
+import { formatDateTimeIso } from "./utils.js";
 
 export async function getChangesetMetadata(changesetId) {
     const url = `https://www.openstreetmap.org/api/0.6/changeset/${changesetId}`;
@@ -39,8 +40,8 @@ export async function getChangesetMetadata(changesetId) {
 
 export async function getOverpassAdiff(bbox, from, to) {
     // Ensure dates are ISO strings without milliseconds
-    const mindate = new Date(from).toISOString().replace(/\.\d{3}Z$/, "Z");
-    const maxdate = to ? new Date(to).toISOString().replace(/\.\d{3}Z$/, "Z") : '';
+    const mindate = formatDateTimeIso(from);
+    const maxdate = formatDateTimeIso(to);
 
     const dateRange = `"${mindate}"` + (maxdate ? `,"${maxdate}"` : '');
     const data_url = 'https://overpass-api.de/api/interpreter';
