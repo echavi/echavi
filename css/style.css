@@ -5,6 +5,15 @@ html, body {
 	margin: 0;
 }
 
+body {
+	background: #52514e;
+}
+
 div#map { 
 	height: 100%;
+}
+
+div#controls {
+	padding: 5px;
+	background: rgb(255, 255, 255, 0.8);
 }
