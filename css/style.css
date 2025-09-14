@@ -13,9 +13,26 @@ div#map {
 	height: 100%;
 }
 
+div.leaflet-top.leaflet-right {
+	max-width: 80%;
+}
+
+div#changeset-control {
+	max-width: 100%;
+}
+
 div#controls {
 	padding: 5px;
 	background: rgb(255, 255, 255, 0.8);
+}
+
+div#controls form {
+	display: flex;
+}
+
+div#controls form input {
+	flex: 1 1 0;
+	min-width: 0;
 }
 
 table.tags {
