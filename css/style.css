@@ -35,6 +35,10 @@ div#controls form input {
 	min-width: 0;
 }
 
+div#controls form#datetimeForm {
+	margin-bottom: 5px;
+}
+
 table.tags {
 	width: 100%;
 }
