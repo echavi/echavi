@@ -17,3 +17,34 @@ div#controls {
 	padding: 5px;
 	background: rgb(255, 255, 255, 0.8);
 }
+
+table.tags {
+	width: 100%;
+}
+
+table.tags td.key {
+	border: 0;
+	background: hsl(0deg 0% 90%);
+}
+
+table.tags td.key.old {
+	background: hsl(0deg 100% 90%);
+}
+
+table.tags td.key.new {
+	background: hsl(120deg 100% 90%);
+}
+
+table.tags td.value {
+	border: 0;
+	background: hsl(0deg 0% 95%);
+	overflow-wrap: anywhere;
+}
+
+table.tags td.value.old {
+	background: hsl(0deg 100% 95%);
+}
+
+table.tags td.value.new {
+	background: hsl(120deg 100% 95%);
+}

@@ -1,5 +1,6 @@
 import { FeatureGroup, Rectangle, CircleMarker, Polyline } from 'leaflet';
 import { COLORS } from './colors.js';
+import { htmlChangesetPopup, htmlElemPopup } from './html-popup.js';
 
 /**
  * Parse OSM changeset metadata and create Leaflet layers
@@ -13,6 +14,7 @@ export function getLayersFromChangesetMetadata(changesetMetadata) {
     ];
 
     const rectangle = new Rectangle(bounds, { color: COLORS.BBOX, weight: 5, fill: false });
+    rectangle.bindPopup(htmlChangesetPopup(changesetMetadata));
 
     const bboxLayer = new FeatureGroup();
     bboxLayer.addLayer(rectangle);
@@ -81,6 +83,7 @@ export function getLayersFromOverpassAdiff(adiffXml) {
             const oldLat = parseFloat(oldNode.getAttribute("lat"));
             const oldLon = parseFloat(oldNode.getAttribute("lon"));
             const oldMarker = new CircleMarker([oldLat, oldLon], { radius: 5, color: oldColor });
+            oldMarker.bindPopup(htmlElemPopup(oldNode, newNode));
             oldLayer.addLayer(oldMarker);
         }
 
@@ -88,6 +91,7 @@ export function getLayersFromOverpassAdiff(adiffXml) {
             const newLat = parseFloat(newNode.getAttribute("lat"));
             const newLon = parseFloat(newNode.getAttribute("lon"));
             const newMarker = new CircleMarker([newLat, newLon], { radius: 5, color: newColor });
+            newMarker.bindPopup(htmlElemPopup(oldNode, newNode));
             newLayer.addLayer(newMarker);
         }
 
@@ -127,11 +131,13 @@ export function getLayersFromOverpassAdiff(adiffXml) {
 
         if (oldWay) {
             const oldPoly = new Polyline(oldCoords, { color: oldColor, weight: 5 });
+            oldPoly.bindPopup(htmlElemPopup(oldWay, newWay));
             oldLayer.addLayer(oldPoly);
         }
 
         if (newWay) {
             const newPoly = new Polyline(newCoords, { color: newColor, weight: 5 });
+            newPoly.bindPopup(htmlElemPopup(oldWay, newWay));
             newLayer.addLayer(newPoly);
         }
 
