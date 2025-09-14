@@ -116,15 +116,24 @@ export function getLayersFromOverpassAdiff(adiffXml) {
             }
         }
 
+        // Check if both old and new nodes have tags
+        const noTags =
+            (!newNode || newNode.querySelectorAll("tag").length === 0) &&
+            (!oldNode || oldNode.querySelectorAll("tag").length === 0);
+        const outlineRadius = noTags ? 6 : 10;
+        const radius        = noTags ? 1 : 5;
+
         if (oldNode) {
             const oldLat = parseFloat(oldNode.getAttribute("lat"));
             const oldLon = parseFloat(oldNode.getAttribute("lon"));
 
-            const oldMarkerOutline = new CircleMarker([oldLat, oldLon], { radius: 10, color: COLORS.OUTLINE, weight: 0, fillOpacity: 0.5 });
+            const oldMarkerOutline = new CircleMarker([oldLat, oldLon], 
+                { radius: outlineRadius, color: COLORS.OUTLINE, weight: 0, fillOpacity: 0.5 });
             oldMarkerOutline.bindPopup(htmlElemPopup(oldNode, newNode));
             oldMarkerLayer.addLayer(oldMarkerOutline);
 
-            const oldMarker = new CircleMarker([oldLat, oldLon], { radius: 5, color: oldColor });
+            const oldMarker = new CircleMarker([oldLat, oldLon], 
+                { radius: radius, color: oldColor });
             oldMarker.bindPopup(htmlElemPopup(oldNode, newNode));
             oldMarkerLayer.addLayer(oldMarker);
         }
@@ -133,11 +142,13 @@ export function getLayersFromOverpassAdiff(adiffXml) {
             const newLat = parseFloat(newNode.getAttribute("lat"));
             const newLon = parseFloat(newNode.getAttribute("lon"));
 
-            const newMarkerOutline = new CircleMarker([newLat, newLon], { radius: 10, color: COLORS.OUTLINE, weight: 0, fillOpacity: 0.5 });
+            const newMarkerOutline = new CircleMarker([newLat, newLon], 
+                { radius: outlineRadius, color: COLORS.OUTLINE, weight: 0, fillOpacity: 0.5 });
             newMarkerOutline.bindPopup(htmlElemPopup(oldNode, newNode));
             newMarkerLayer.addLayer(newMarkerOutline);
 
-            const newMarker = new CircleMarker([newLat, newLon], { radius: 5, color: newColor });
+            const newMarker = new CircleMarker([newLat, newLon], 
+                { radius: radius, color: newColor });
             newMarker.bindPopup(htmlElemPopup(oldNode, newNode));
             newMarkerLayer.addLayer(newMarker);
         }
