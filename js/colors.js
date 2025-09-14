@@ -5,4 +5,5 @@ export const COLORS = {
     DELETED: '#ff3333',
     GEOM_OLD: '#8b0000',
     GEOM_NEW: '#90ee90',
+    OUTLINE : '#000000',
 };

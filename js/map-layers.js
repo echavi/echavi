@@ -25,11 +25,16 @@ export function getLayersFromChangesetMetadata(changesetMetadata) {
         [bbox.top + expandY, bbox.right + expandX]
     ];
 
-    const rectangle = new Rectangle(bounds, { color: COLORS.BBOX, weight: 5, fill: false });
-    rectangle.bindPopup(htmlChangesetPopup(changesetMetadata));
-
     const bboxLayer = new FeatureGroup();
+
+    const rectangleOutline = new Rectangle(bounds, { color: COLORS.OUTLINE, weight: 10, fill: false, opacity: 0.3 });
+    rectangleOutline.bindPopup(htmlChangesetPopup(changesetMetadata));
+    bboxLayer.addLayer(rectangleOutline);
+
+    const rectangle = new Rectangle(bounds, { color: COLORS.BBOX, weight: 3, fill: false });
+    rectangle.bindPopup(htmlChangesetPopup(changesetMetadata));
     bboxLayer.addLayer(rectangle);
+
     return bboxLayer;
 }
 
@@ -94,6 +99,11 @@ export function getLayersFromOverpassAdiff(adiffXml) {
         if (oldNode) {
             const oldLat = parseFloat(oldNode.getAttribute("lat"));
             const oldLon = parseFloat(oldNode.getAttribute("lon"));
+
+            const oldMarkerOutline = new CircleMarker([oldLat, oldLon], { radius: 10, color: COLORS.OUTLINE, weight: 0, fillOpacity: 0.5 });
+            oldMarkerOutline.bindPopup(htmlElemPopup(oldNode, newNode));
+            oldLayer.addLayer(oldMarkerOutline);
+
             const oldMarker = new CircleMarker([oldLat, oldLon], { radius: 5, color: oldColor });
             oldMarker.bindPopup(htmlElemPopup(oldNode, newNode));
             oldLayer.addLayer(oldMarker);
@@ -102,6 +112,11 @@ export function getLayersFromOverpassAdiff(adiffXml) {
         if (newNode) {
             const newLat = parseFloat(newNode.getAttribute("lat"));
             const newLon = parseFloat(newNode.getAttribute("lon"));
+
+            const newMarkerOutline = new CircleMarker([newLat, newLon], { radius: 10, color: COLORS.OUTLINE, weight: 0, fillOpacity: 0.5 });
+            newMarkerOutline.bindPopup(htmlElemPopup(oldNode, newNode));
+            newLayer.addLayer(newMarkerOutline);
+
             const newMarker = new CircleMarker([newLat, newLon], { radius: 5, color: newColor });
             newMarker.bindPopup(htmlElemPopup(oldNode, newNode));
             newLayer.addLayer(newMarker);
@@ -142,13 +157,21 @@ export function getLayersFromOverpassAdiff(adiffXml) {
         }
 
         if (oldWay) {
-            const oldPoly = new Polyline(oldCoords, { color: oldColor, weight: 5 });
+            const oldPolyOutline = new Polyline(oldCoords, { color: COLORS.OUTLINE, weight: 10, opacity: 0.5 });
+            oldPolyOutline.bindPopup(htmlElemPopup(oldWay, newWay));
+            oldLayer.addLayer(oldPolyOutline);
+            
+            const oldPoly = new Polyline(oldCoords, { color: oldColor, weight: 3 });
             oldPoly.bindPopup(htmlElemPopup(oldWay, newWay));
             oldLayer.addLayer(oldPoly);
         }
 
         if (newWay) {
-            const newPoly = new Polyline(newCoords, { color: newColor, weight: 5 });
+            const newPolyOutline = new Polyline(newCoords, { color: COLORS.OUTLINE, weight: 10, opacity: 0.5 });
+            newPolyOutline.bindPopup(htmlElemPopup(oldWay, newWay));
+            newLayer.addLayer(newPolyOutline);
+            
+            const newPoly = new Polyline(newCoords, { color: newColor, weight: 3 });
             newPoly.bindPopup(htmlElemPopup(oldWay, newWay));
             newLayer.addLayer(newPoly);
         }
