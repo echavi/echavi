@@ -8,9 +8,21 @@ import { htmlChangesetPopup, htmlElemPopup } from './html-popup.js';
 export function getLayersFromChangesetMetadata(changesetMetadata) {
 
     const bbox = changesetMetadata.bbox;
+
+    // Minimum size in degrees
+    const MIN_SIZE = 0.00005;
+
+    // Calculate width and height
+    let width = bbox.right - bbox.left;
+    let height = bbox.top - bbox.bottom;
+
+    // Expand bbox if below minimum size
+    const expandX = Math.max(MIN_SIZE - width, 0) / 2;
+    const expandY = Math.max(MIN_SIZE - height, 0) / 2;
+
     const bounds = [
-        [bbox.bottom, bbox.left],
-        [bbox.top, bbox.right]
+        [bbox.bottom - expandY, bbox.left - expandX],
+        [bbox.top + expandY, bbox.right + expandX]
     ];
 
     const rectangle = new Rectangle(bounds, { color: COLORS.BBOX, weight: 5, fill: false });
