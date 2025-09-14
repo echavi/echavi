@@ -40,7 +40,7 @@ changesetControl.onAdd = function(map) {
 changesetControl.addTo(map);
 
 // Keep references to layers for clearing
-let oldLayer, newLayer, bboxLayer;
+let oldPolyLayer, newPolyLayer, oldMarkerLayer, newMarkerLayer, bboxLayer;
 
 // Get controls
 const changesetIdInput = document.getElementById('changesetIdInput');
@@ -56,8 +56,10 @@ changesetForm.addEventListener('submit', async (event) => {
 
 async function loadChangesetDiff(id) {
     // Clear previous layers
-    if (oldLayer) map.removeLayer(oldLayer);
-    if (newLayer) map.removeLayer(newLayer);
+    if (oldPolyLayer) map.removeLayer(oldPolyLayer);
+    if (newPolyLayer) map.removeLayer(newPolyLayer);
+    if (oldMarkerLayer) map.removeLayer(oldMarkerLayer);
+    if (newMarkerLayer) map.removeLayer(newMarkerLayer);
     if (bboxLayer) map.removeLayer(bboxLayer);
 
     // Update the control inputs
@@ -77,13 +79,18 @@ async function loadChangesetDiff(id) {
     // Load and display changeset content
     const adiff = await getOverpassAdiff(changesetMetadata);
     const layers = getLayersFromOverpassAdiff(adiff);
-    oldLayer = layers.oldLayer;
-    newLayer = layers.newLayer;
-    oldLayer.addTo(map);
-    newLayer.addTo(map);
+    oldPolyLayer = layers.oldPolyLayer;
+    newPolyLayer = layers.newPolyLayer;
+    oldMarkerLayer = layers.oldMarkerLayer;
+    newMarkerLayer = layers.newMarkerLayer;
+    
+    oldPolyLayer.addTo(map);
+    newPolyLayer.addTo(map);
+    oldMarkerLayer.addTo(map);
+    newMarkerLayer.addTo(map);
 
-    // combine both layers to fit map
-    const combined = new FeatureGroup([oldLayer, newLayer]);
+    // combine all layers to fit map
+    const combined = new FeatureGroup([bboxLayer, oldPolyLayer, newPolyLayer, oldMarkerLayer, newMarkerLayer]);
     if (combined.getBounds().isValid()) {
         map.fitBounds(combined.getBounds());
     }
