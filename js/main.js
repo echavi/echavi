@@ -55,6 +55,11 @@ async function loadChangesetDiff(id) {
     // Update the control inputs
     changesetIdInput.value = id;
 
+    // Update the URL without reloading the page
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.set('changeset', id);
+    history.replaceState(null, '', newUrl);
+    
     // Load and display changeset metadata
     const changesetMetadata = await getChangesetMetadata(id);
     bboxLayer = getLayersFromChangesetMetadata(changesetMetadata);
@@ -74,4 +79,11 @@ async function loadChangesetDiff(id) {
     if (combined.getBounds().isValid()) {
         map.fitBounds(combined.getBounds());
     }
+}
+
+// Load changeset from URL if present
+const params = new URLSearchParams(window.location.search);
+const csId = params.get('changeset');
+if (csId) {
+    loadChangesetDiff(csId);
 }
