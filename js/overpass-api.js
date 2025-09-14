@@ -36,3 +36,41 @@ export async function getChangesetMetadata(changesetId) {
         tags
     };
 }
+
+export async function getOverpassAdiff(changesetMetadata) {
+
+    const fromDate = new Date(changesetMetadata.created_at);
+    fromDate.setSeconds(fromDate.getSeconds() - 1); // workaround: subtract 1 second from start date
+    const from = fromDate.toISOString();
+    const to = changesetMetadata.closed_at;
+    const bbox = changesetMetadata.bbox;
+    const id = changesetMetadata.id;
+
+    console.log(`Loading changeset ${id} from ${from} to ${to} in bbox`, bbox);
+
+
+    // format dates using native Date
+    const mindate = new Date(from).toISOString().replace(/\.\d{3}Z$/, "Z");
+    const maxdate = to ? new Date(to).toISOString().replace(/\.\d{3}Z$/, "Z") : '';
+
+    let dateRange = `"${mindate}"` + (maxdate ? `,"${maxdate}"` : '');
+
+    // build URL
+    const data_url = 'https://overpass-api.de/api/interpreter';
+    let url = `${data_url}?data=[adiff:${dateRange}];(node(bbox)(changed);way(bbox)(changed););out meta geom(bbox);`;
+
+    // add bbox
+    const bboxParam = `&bbox=${bbox.left},${bbox.bottom},${bbox.right},${bbox.top}`;
+    url += bboxParam;
+
+    console.log("Requesting URL:", url);
+
+    try {
+        const res = await fetch(url);
+        const text = await res.text();
+        console.log("Overpass XML result:\n", text);
+        return text;
+    } catch (err) {
+        console.error("Error fetching Overpass diff:", err);
+    }
+}

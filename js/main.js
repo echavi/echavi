@@ -1,6 +1,6 @@
-import { LeafletMap, TileLayer, Control } from 'leaflet';
-import { getChangesetMetadata } from './overpass-api.js';
-import { getLayersFromChangesetMetadata } from './map-layers.js';
+import { LeafletMap, TileLayer, Control, FeatureGroup } from 'leaflet';
+import { getChangesetMetadata, getOverpassAdiff } from './overpass-api.js';
+import { getLayersFromChangesetMetadata, getLayersFromOverpassAdiff } from './map-layers.js';
 
 const TILE_DARKNESS = 'brightness(30%)';
 
@@ -32,7 +32,7 @@ changesetControl.onAdd = function(map) {
 changesetControl.addTo(map);
 
 // Keep references to layers for clearing
-let bboxLayer;
+let oldLayer, newLayer, bboxLayer;
 
 // Get controls
 const changesetIdInput = document.getElementById('changesetIdInput');
@@ -48,11 +48,30 @@ changesetForm.addEventListener('submit', async (event) => {
 
 async function loadChangesetDiff(id) {
     // Clear previous layers
+    if (oldLayer) map.removeLayer(oldLayer);
+    if (newLayer) map.removeLayer(newLayer);
     if (bboxLayer) map.removeLayer(bboxLayer);
+
+    // Update the control inputs
+    changesetIdInput.value = id;
 
     // Load and display changeset metadata
     const changesetMetadata = await getChangesetMetadata(id);
     bboxLayer = getLayersFromChangesetMetadata(changesetMetadata);
     bboxLayer.addTo(map);
     map.fitBounds(bboxLayer.getBounds());
-});
+
+    // Load and display changeset content
+    const adiff = await getOverpassAdiff(changesetMetadata);
+    const layers = getLayersFromOverpassAdiff(adiff);
+    oldLayer = layers.oldLayer;
+    newLayer = layers.newLayer;
+    oldLayer.addTo(map);
+    newLayer.addTo(map);
+
+    // combine both layers to fit map
+    const combined = new FeatureGroup([oldLayer, newLayer]);
+    if (combined.getBounds().isValid()) {
+        map.fitBounds(combined.getBounds());
+    }
+}
