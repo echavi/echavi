@@ -39,19 +39,64 @@ export function htmlElemPopup(oldElem, newElem) {
     const type = elem.tagName.toLowerCase();
     const id = elem.getAttribute("id");
 
-    const url = type === "node" 
+    const url = type === "node"
         ? `https://www.openstreetmap.org/node/${id}` 
         : `https://www.openstreetmap.org/way/${id}`;
 
-    // Change type
+    // Determine change type
     let changeType;
     if (!oldElem && newElem) changeType = "create";
     else if (oldElem && !newElem) changeType = "delete";
     else changeType = "modify";
 
+    function getOsmLink(changeset) {
+        return `<a href=https://www.openstreetmap.org/changeset/${changeset}>${changeset}</a>`;
+    }
+
+    // Extract metadata from <old> and <new> elements
+    let versionOld, changesetOld, timestampOld, userOld;
+    if (oldElem) {
+        versionOld = oldElem.getAttribute("version");
+        changesetOld = getOsmLink(oldElem.getAttribute("changeset"));
+        timestampOld = oldElem.getAttribute("timestamp");
+        userOld = oldElem.getAttribute("user");
+    }
+    let versionNew, changesetNew, timestampNew, userNew;
+    if (newElem) {
+        versionNew = newElem.getAttribute("version");
+        changesetNew = getOsmLink(newElem.getAttribute("changeset"));
+        timestampNew = newElem.getAttribute("timestamp");
+        userNew = newElem.getAttribute("user");
+    }
+
+    // Build metadata table rows
+    let metadata;
+    if (oldElem && newElem) {
+        metadata = `
+            <tr><td class="key">version</td><td class="value">${versionOld}</td><td class="value">${versionNew}</td></tr>
+            <tr><td class="key">changeset</td><td class="value">${changesetOld}</td><td class="value">${changesetNew}</td></tr>
+            <tr><td class="key">timestamp</td><td class="value">${timestampOld}</td><td class="value">${timestampNew}</td></tr>
+            <tr><td class="key">user</td><td class="value">${userOld}</td><td class="value">${userNew}</td></tr>
+            <tr><td colspan="3"><hr style="display:none;"></td></tr>
+        `;
+    }
+    else {
+        metadata = `
+            <tr><td class="key">version</td><td class="value">${versionOld || versionNew}</td></tr>
+            <tr><td class="key">changeset</td><td class="value">${changesetOld || changesetNew}</td></tr>
+            <tr><td class="key">timestamp</td><td class="value">${timestampOld || timestampNew}</td></tr>
+            <tr><td class="key">user</td><td class="value">${userOld || userNew}</td></tr>
+            <tr><td colspan="2"><hr style="display:none;"></td></tr>
+        `;
+    }
+
     return `
         <b>${changeType} ${type} <a href="${url}" target="_blank">${id}</a></b>
-        <br>${diffTags(oldElem, newElem)}
+        <br>
+        <table class="tags">
+            ${metadata}
+            ${diffTags(oldElem, newElem)}
+        </table>
     `;
 }
 
@@ -101,12 +146,8 @@ function diffTags(oldElem, newElem) {
     }
 
     if (rows.length === 0) {
-        return "<i>No tags</i>";
+        return "<tr><td><i>No tags</i></td></tr>";
     }
 
-    return `
-        <table class="tags">
-            ${rows.join("\n")}
-        </table>
-    `;
+    return rows.join("\n");
 }
