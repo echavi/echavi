@@ -8,7 +8,11 @@ const TILE_DARKNESS = 'brightness(30%)';
 // Load params from URL
 const params = new URLSearchParams(window.location.search);
 
-const map = new LeafletMap('map').setView([51.505, -0.09], 13);
+// Load lat/lon/zoom from URL if present
+const lat = parseFloat(params.get('lat')) || 51.505;
+const lon = parseFloat(params.get('lon')) || -0.09;
+const z = parseInt(params.get('z'), 10) || 13;
+const map = new LeafletMap('map').setView([lat, lon], z);
 
 const tiles = new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -17,6 +21,22 @@ const tiles = new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Apply a dark filter to the tile layer
 tiles.getContainer().style.filter = TILE_DARKNESS;
+
+// Function to update URL with current map center and zoom
+function updateUrlWithMapView() {
+    const center = map.getCenter();
+    const zoom = map.getZoom();
+
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.set('lat', center.lat.toFixed(5));
+    newUrl.searchParams.set('lon', center.lng.toFixed(5));
+    newUrl.searchParams.set('z', zoom);
+
+    history.replaceState(null, '', formatPrettyUrl(newUrl));
+}
+
+// Listen for panning and zooming
+map.on('moveend zoomend', updateUrlWithMapView);
 
 // Add github link to attribution
 const attributionDiv = document.querySelector('div.leaflet-control-attribution');
