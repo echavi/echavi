@@ -3,6 +3,24 @@ import { COLORS } from './colors.js';
 import { htmlChangesetPopup, htmlElemPopup } from './html-popup.js';
 
 /**
+ * Create Leaflet layers for a given bbox
+ */
+export function getLayersFromBbox(bbox) {
+
+    const bboxLayer = new FeatureGroup();
+
+    const bounds = [[bbox.bottom, bbox.left],[bbox.top, bbox.right]];
+
+    const rectangleOutline = new Rectangle(bounds, { color: COLORS.OUTLINE, weight: 10, fill: false, opacity: 0.3 });
+    bboxLayer.addLayer(rectangleOutline);
+
+    const rectangle = new Rectangle(bounds, { color: COLORS.BBOX, weight: 3, fill: false, dashArray: '10,10' });
+    bboxLayer.addLayer(rectangle);
+
+    return bboxLayer;
+}
+
+/**
  * Parse OSM changeset metadata and create Leaflet layers
  */
 export function getLayersFromChangesetMetadata(changesetMetadata) {

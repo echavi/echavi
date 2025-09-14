@@ -1,6 +1,6 @@
 import { LeafletMap, TileLayer, Control, FeatureGroup } from 'leaflet';
 import { getChangesetMetadata, getChangesetOverpassAdiff, getOverpassAdiff } from './overpass-api.js';
-import { getLayersFromChangesetMetadata, getLayersFromOverpassAdiff } from './map-layers.js';
+import { getLayersFromChangesetMetadata, getLayersFromBbox, getLayersFromOverpassAdiff } from './map-layers.js';
 import { formatDateTimeIsoLocal, formatDateTimeCompact, parseDateTime, formatBboxCompact, parseDateTimeCompact, formatPrettyUrl } from './utils.js';
 
 const TILE_DARKNESS = 'brightness(30%)';
@@ -181,6 +181,11 @@ async function loadDatetimeDiff(bbox, start, end) {
     newUrl.searchParams.set('bbox', formatBboxCompact(bbox));
     newUrl.searchParams.delete('changeset');
     history.replaceState(null, '', formatPrettyUrl(newUrl));
+
+    // Load and display bbox
+    bboxLayer = getLayersFromBbox(bbox);
+    bboxLayer.addTo(map);
+    map.fitBounds(bboxLayer.getBounds());
 
     // Load and display changes
     const adiff = await getOverpassAdiff(bbox, start, end);
