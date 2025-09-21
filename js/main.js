@@ -37,6 +37,7 @@ function updateUrlWithMapView() {
 
 // Listen for panning and zooming
 map.on('moveend zoomend', updateUrlWithMapView);
+map.on('moveend zoomend', updateBboxPlaceholder);
 
 // Add github link to attribution
 const attributionDiv = document.querySelector('div.leaflet-control-attribution');
@@ -57,13 +58,22 @@ changesetControl.onAdd = function(map) {
     container.innerHTML = `
         <div id="controls">
             <form id="datetimeForm">
-                <input id="startDateInput" placeholder="${formatDateTimeIsoLocal(getDefaultStartDate())}"/>
-                <input id="endDateInput" placeholder="now" />
-                <button type="submit" id="datetimeLoadButton">Load</button>
+                <div>
+                    <input id="startDateInput" placeholder="${formatDateTimeIsoLocal(getDefaultStartDate())}"/>
+                    <input id="endDateInput" placeholder="now" />
+                    <button type="submit" id="datetimeLoadButton">Load</button>
+                </div>
+                <div>
+                    <input id="bboxInput" />
+                </div>
             </form>
+        </div>
+        <div id="controls">
             <form id="changesetForm">
-                <input id="changesetIdInput" placeholder="Changeset ID" />
-                <button type="submit" id="changesetLoadButton">Load</button>
+                <div>
+                    <input id="changesetIdInput" placeholder="Changeset ID" />
+                    <button type="submit" id="changesetLoadButton">Load</button>
+                </div>
             </form>
         </div>
     `;
@@ -83,6 +93,24 @@ const changesetLoadButton = document.getElementById('changesetLoadButton')
 const startDateInput = document.getElementById('startDateInput');
 const endDateInput = document.getElementById('endDateInput');
 const datetimeForm = document.getElementById('datetimeForm');
+const bboxInput = document.getElementById('bboxInput');
+
+// Function to update bbox input placeholder with current map bbox
+function updateBboxPlaceholder() {
+    // Get bbox of current map view
+    const bounds = map.getBounds();
+    const bbox = {
+        left: bounds.getWest(),
+        bottom: bounds.getSouth(),
+        right: bounds.getEast(),
+        top: bounds.getNorth()
+    };
+
+    bboxInput.placeholder = formatBboxCompact(bbox);
+}
+
+// Initial update of bbox placeholder
+updateBboxPlaceholder();
 
 // Keep references to layers for clearing
 let oldPolyLayer, newPolyLayer, oldMarkerLayer, newMarkerLayer, bboxLayer;
@@ -149,14 +177,22 @@ datetimeForm.addEventListener('submit', async (event) => {
     const start = parseDateTime(startDateInput.value) || getDefaultStartDate();
     const end = parseDateTime(endDateInput.value);
 
-    // Get bbox of current map view
-    const bounds = map.getBounds();
-    const bbox = {
-        left: bounds.getWest(),
-        bottom: bounds.getSouth(),
-        right: bounds.getEast(),
-        top: bounds.getNorth()
-    };
+    let bbox;
+    if (bboxInput.value) {
+        const parts = bboxInput.value.split(',').map(parseFloat);
+        if (parts.length === 4 && parts.every(n => !isNaN(n))) {
+            bbox = { left: parts[0], bottom: parts[1], right: parts[2], top: parts[3] };
+        }
+    } else {
+        // Get bbox of current map view
+        const bounds = map.getBounds();
+        bbox = {
+            left: bounds.getWest(),
+            bottom: bounds.getSouth(),
+            right: bounds.getEast(),
+            top: bounds.getNorth()
+        };
+    }
 
     loadDatetimeDiff(bbox, start, end);
 });
@@ -173,6 +209,7 @@ async function loadDatetimeDiff(bbox, start, end) {
     startDateInput.value = formatDateTimeIsoLocal(start);
     endDateInput.value = formatDateTimeIsoLocal(end) || '';
     changesetIdInput.value = '';
+    bboxInput.value = formatBboxCompact(bbox);
 
     // Update the URL without reloading the page
     const newUrl = new URL(window.location);

@@ -22,21 +22,23 @@ div#changeset-control {
 }
 
 div#controls {
-	padding: 5px;
+	padding: 5px 5px 5px 5px;
 	background: rgb(255, 255, 255, 0.8);
+	margin-bottom: 5px;
 }
 
-div#controls form {
+div#controls form div {
 	display: flex;
+	margin-bottom: 5px;
 }
 
-div#controls form input {
+div#controls form div:last-of-type {
+	margin-bottom: 0px;
+}
+
+div#controls form div input {
 	flex: 1 1 0;
 	min-width: 0;
-}
-
-div#controls form#datetimeForm {
-	margin-bottom: 5px;
 }
 
 table.tags {
