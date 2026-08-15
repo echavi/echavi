@@ -1,0 +1,45 @@
+#console {
+    position: fixed;
+    z-index: 1000;
+    bottom: 25px;
+    left: 10px;
+
+    width: 400px;
+    max-width: calc(100vw - 20px);
+    max-height: min(30vh, 300px);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 5px;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+.console-line {
+    padding: 6px 10px;
+
+    background: rgb(0, 0, 0);
+    color: rgb(200, 200, 200);
+
+    border-radius: 4px;
+
+    font-family: monospace;
+    font-size: 9px;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    opacity: 0.5;
+    transition: opacity 5s ease;
+}
+
+.console-line.fade-out {
+    opacity: 0;
+}
+
+.console-line.console-error {
+    color: rgb(255, 80, 80);
+}
