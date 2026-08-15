@@ -1,4 +1,4 @@
-import { LeafletMap, TileLayer, Control, FeatureGroup } from 'leaflet';
+import { LeafletMap, TileLayer, Control, FeatureGroup, DomEvent } from 'leaflet';
 import { getChangesetMetadata, getChangesetOverpassAdiff, getOverpassAdiff } from './overpass-api.js';
 import { getLayersFromChangesetMetadata, getLayersFromBbox, getLayersFromOverpassAdiff } from './map-layers.js';
 import { formatDateTimeIsoLocal, formatDateTimeCompact, parseDateTime, formatBboxCompact, parseDateTimeCompact, formatPrettyUrl } from './utils.js';
@@ -78,9 +78,8 @@ changesetControl.onAdd = function(map) {
         </div>
     `;
     // Prevent clicks from propagating to the map
-    container.addEventListener('click', e => e.stopPropagation());
-    container.addEventListener('mousedown', e => e.stopPropagation());
-    container.addEventListener('dblclick', e => e.stopPropagation());
+    DomEvent.disableClickPropagation(container);
+    DomEvent.disableScrollPropagation(container);
     return container;
 };
 changesetControl.addTo(map);
