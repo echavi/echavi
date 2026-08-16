@@ -2,15 +2,20 @@ import { formatDateTimeIso } from "./utils.js";
 
 export async function getChangesetMetadata(changesetId) {
     const url = `https://www.openstreetmap.org/api/0.6/changeset/${changesetId}`;
+
+    console.log("[overpass-api.js] Requesting URL:", url);
+
     const res = await fetch(url);
     const xmlText = await res.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlText, "application/xml");
     const cs = xml.querySelector("changeset");
 
-    console.log("Changeset metadata XML result:\n", xmlText);
+    console.log("[overpass-api.js] OSM changeset metadata received");
+    console.debug("[overpass-api.js] OSM changeset metadata XML result:\n", xmlText);
 
     if (!cs) {
+        console.error("[overpass-api.js] No changeset found")
         throw new Error("No changeset found");
     }
 
@@ -50,15 +55,41 @@ export async function getOverpassAdiff(bbox, from, to) {
                 `(node(bbox)(changed);way(bbox)(changed););out meta geom(bbox);` +
                 `&bbox=${bbox.left},${bbox.bottom},${bbox.right},${bbox.top}`;
 
-    console.log("Requesting URL:", url);
+    console.log("[overpass-api.js] Requesting URL:", url);
 
     try {
         const res = await fetch(url);
         const text = await res.text();
-        console.log("Overpass XML result:\n", text);
+
+        if (!res.ok) {
+            throw new Error(
+                `Overpass HTTP error ${res.status}: ${res.statusText}`
+            );
+        }
+
+        console.log("[overpass-api.js] Overpass diff received")
+        console.debug("[overpass-api.js] Overpass XML result:\n", text);
+
+        // Overpass sometimes returns an HTML error document
+        if (text.includes("<html") || text.includes("<!DOCTYPE html")) {
+            const doc = new DOMParser().parseFromString(text, "text/html");
+
+            const errorParagraph = [...doc.querySelectorAll("p")]
+                .find(p => p.textContent.includes("Error"));
+
+            const message = errorParagraph
+                ? errorParagraph.textContent.trim()
+                : "Overpass returned an HTML error response";
+
+            throw new Error(
+                `Overpass error: ${message}`
+            );
+        }
+
         return text;
     } catch (err) {
-        console.error("Error fetching Overpass diff:", err);
+        console.error("[overpass-api.js] Error fetching Overpass diff:", err);
+        throw err;
     }
 }
 
@@ -70,7 +101,7 @@ export async function getChangesetOverpassAdiff(changesetMetadata) {
     const bbox = changesetMetadata.bbox;
     const id = changesetMetadata.id;
 
-    console.log(`Loading changeset ${id} from ${from} to ${to} in bbox`, bbox);
+    console.log(`[overpass-api.js] Loading changeset ${id} from ${from} to ${to} in bbox`, bbox);
 
     return getOverpassAdiff(bbox, from, to);
 }
