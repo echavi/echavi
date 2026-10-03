@@ -48,6 +48,7 @@ table.tags {
 table.tags td.key {
 	border: 0;
 	background: hsl(0deg 0% 90%);
+	overflow-wrap: anywhere;
 }
 
 table.tags td.key.old {
