@@ -1,5 +1,6 @@
 import { LeafletMap, TileLayer, Control, FeatureGroup, DomEvent } from 'leaflet';
-import { getChangesetMetadata, getChangesetOverpassAdiff, getOverpassAdiff } from './overpass-api.js';
+import { getChangesetMetadata } from './osm-api.js';
+import { getChangesetOverpassAdiff, getOverpassAdiff } from './overpass-api.js';
 import { getLayersFromChangesetMetadata, getLayersFromBbox, getLayersFromOverpassAdiff } from './map-layers.js';
 import { formatDateTimeIsoLocal, formatDateTimeCompact, parseDateTime, formatBboxCompact, parseDateTimeCompact, formatPrettyUrl } from './utils.js';
 
